@@ -1,5 +1,5 @@
 // BIG LED CLOCK
-// https://github.com/JChristensen/DS3232RTC
+// https://github.com/deepdoo/BIGCLOCK
 //
 
 #include <DS3232RTC.h>
