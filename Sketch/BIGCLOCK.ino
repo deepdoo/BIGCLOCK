@@ -1,5 +1,5 @@
 // BIG LED CLOCK
-// https://github.com/deepdoo/BIGCLOCK
+// https://github.com/JChristensen/DS3232RTC
 //
 
 #include <DS3232RTC.h>
@@ -8,7 +8,8 @@
 #define LATCHPIN  (4)  // 74HC595のST_CPへ
 #define CLOCKPIN  (3)  // 74HC595のSH_CPへ
 
-const int RECV_PIN = 11;
+byte count = 0;
+const int RECV_PIN = 12;
 IRrecv irrecv(RECV_PIN);
 decode_results results;
 boolean mode = true; //true normal, false setup mode
@@ -80,39 +81,39 @@ void loop()
 
     Serial.println(results.value, HEX);
     switch (results.value) {
-      case 0x5AF1484A://0x73508B9E:
+      case 0x5AF1484A: case 0x73508B9E:
         Serial.println("mode");
         mode = !mode;
         break;
-      case 0x5AF148A8://0x29728F39:
+      case 0x5AF148A8: case 0x29728F39:
         Serial.println("hour minus");
         if (!mode) {
           setTime((hour() + 23) % 24, minute(), second(), day(), month(), year()); //時、分、秒、日、月、年の順で入力
           RTC.set(now());
         }
         break;
-      case 0x5AF14828://0xDA882442:
+      case 0x5AF14828: case 0xDA882442:
         Serial.println("hour add");
         if (!mode) {
           setTime((hour() + 1) % 24, minute(), second(), day(), month(), year()); //時、分、秒、日、月、年の順で入力
           RTC.set(now());
         }
         break;
-      case 0x5AF14888://0x452C5CE0:
+      case 0x5AF14888: case 0x452C5CE0:
         Serial.println("minute add");
         if (!mode) {
           setTime(hour(), (minute() + 1) % 60, second(), day(), month(), year()); //時、分、秒、日、月、年の順で入力
           RTC.set(now());
         }
         break;
-      case 0x5AF14848://0xEAA22D24:
+      case 0x5AF14848: case 0xEAA22D24:
         Serial.println("minute minus");
         if (!mode) {
           setTime(hour(), (minute() + 59) % 60, second(), day(), month(), year()); //時、分、秒、日、月、年の順で入力
           RTC.set(now());
         }
         break ;
-      case 0x5AF148C8:
+      case 0x5AF148C8: case 0xB02818A8:
         showdot = !showdot;
         break ;
     }
@@ -131,22 +132,16 @@ void loop()
     ph1 = 0;
 
   if (mode) {
-    if (showdot && showDot) {
-
+    if (showdot && showDot)
       show(ph1 | (patterns[h2] | 1 << dot) << 8 | patterns[m1] << 16 | patterns[m2] << 24);
-    }
-    else {
+    else
       show(ph1 | patterns[h2] << 8 | patterns[m1] << 16 | patterns[m2] << 24);
-
-    }
-
-    showDot = !showDot;
-
+    if (count % 2 == 0)
+      showDot = !showDot;
   } else {
-
     show(ph1 | 1 << dot | (patterns[h2] | 1 << dot) << 8 | (patterns[m1] | 1 << dot) << 16 | (patterns[m2] | 1 << dot) << 24);
   }
-
+  count++;
   delay(400);
 }
 
