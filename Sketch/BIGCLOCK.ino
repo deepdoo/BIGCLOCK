@@ -59,10 +59,11 @@ void setup()
 
   pinMode(DATAPIN, OUTPUT);
   pinMode(LATCHPIN, OUTPUT);
-  pinMode(CLOCKPIN, OUTPUT);
+  pinMode(CLOCKPIN, OUTPåUT);
 
   show(patterns[8] | 1 << dot | (patterns[8] | 1 << dot) << 8 | (patterns[8] | 1 << dot) << 16 | (patterns[8] | 1 << dot) << 24);
 
+  delay(1000);
   Serial.begin(9600);
   irrecv.enableIRIn();
   irrecv.blink13(true);
